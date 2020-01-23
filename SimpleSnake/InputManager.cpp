@@ -56,3 +56,15 @@ bool InputManager::KeyUp(int key)
 {
 	return keyMap[key].release;
 }
+
+void InputManager::PressKey(int key)
+{
+	if (!keyMap[key].down)
+		keyMap[key].pressed = true;
+}
+
+void InputManager::ReleaseKey(int key)
+{
+	if (keyMap[key].down)
+		keyMap[key].released = true;
+}

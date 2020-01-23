@@ -28,11 +28,14 @@ public:
 	bool KeyDown(int key);
 	bool KeyUp(int key);
 
+
 	void EndFrame();
 
 
 private:
 	void UpdateInformation(KeyState& state);
+	void PressKey(int key);
+	void ReleaseKey(int key);
 	
 };
 

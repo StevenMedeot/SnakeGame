@@ -14,13 +14,14 @@ void GameWindow::GetInputs()
 		}
 		if (e.type == SDL_KEYDOWN)
 		{
-			inputManager->keyMap[e.key.keysym.sym].pressed = true;
+			inputManager->PressKey(e.key.keysym.sym);
 		}
 		if (e.type == SDL_KEYUP)
 		{
-			inputManager->keyMap[e.key.keysym.sym].released = true;
+			inputManager->ReleaseKey(e.key.keysym.sym);
 		}
 	}
+
 }
 
 GameWindow::GameWindow(string name, int width, int height): title(name), screenWidth(width), screenHeight(height)
@@ -88,29 +89,51 @@ bool GameWindow::InitWindow()
 	return success;
 }
 
+int positionX = 0;
+int positionY = 0;
 void GameWindow::UpdateWindow()
 {
 	// Game Loop 
 	while (b_isRunning)
 	{
 		GetInputs();
-
-		inputManager->EndFrame();
-		if (inputManager->KeyDown(SDLK_ESCAPE))
+		if (inputManager->KeyPress(SDLK_ESCAPE))
 		{
 			b_isRunning = false;
+		}
+		if (inputManager->KeyDown(SDLK_d)
+)
+		{
+			positionX += 1;
+		}
+
+		if (inputManager->KeyDown(SDLK_a))
+		{
+			positionX -= 1;
+		}
+
+		if (inputManager->KeyDown(SDLK_w))
+		{
+			positionY -= 1;
+		}
+
+		if (inputManager->KeyDown(SDLK_s))
+		{
+			positionY += 1;
 		}
 
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
 
-		SDL_Rect rect = { screenWidth / 4, screenHeight / 4, screenWidth / 4, screenHeight / 4 };
+		SDL_Rect rect = {positionX, positionY, screenWidth / 4, screenHeight / 4 };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &rect);
 
 		//Update the surface
 		SDL_RenderPresent(renderer);
-		
+
+		inputManager->EndFrame();
+
 	}
 }
 
