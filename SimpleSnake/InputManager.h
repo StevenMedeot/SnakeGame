@@ -24,9 +24,9 @@ public:
 	InputManager();
 	~InputManager();
 
-	bool KeyPress(int key);
-	bool KeyDown(int key);
-	bool KeyUp(int key);
+	bool GetKeyPress(int key);
+	bool GetKeyDown(int key);
+	bool GetKeyUp(int key);
 
 
 	void EndFrame();

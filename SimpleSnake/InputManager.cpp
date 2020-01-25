@@ -12,11 +12,11 @@ InputManager::~InputManager()
 {
 }
 
+// Updates the keystates information in the map
 void InputManager::UpdateInformation(KeyState &state)
 {
 	state.press = false;
 	state.release = false;
-
 
 	if (state.pressed)
 	{
@@ -33,6 +33,7 @@ void InputManager::UpdateInformation(KeyState &state)
 	}
 }
 
+// At the end of each frame update the keys information
 void InputManager::EndFrame()
 {
 	for (map<int, KeyState>::iterator it = keyMap.begin(); it != keyMap.end(); it++)
@@ -42,21 +43,23 @@ void InputManager::EndFrame()
 
 }
 
-bool InputManager::KeyPress(int key)
+// Accessors for each keys current state
+bool InputManager::GetKeyPress(int key)
 {
 	return keyMap[key].press;
 }
 
-bool InputManager::KeyDown(int key)
+bool InputManager::GetKeyDown(int key)
 {
 	return keyMap[key].down;
 }
 
-bool InputManager::KeyUp(int key)
+bool InputManager::GetKeyUp(int key)
 {
 	return keyMap[key].release;
 }
 
+// Mutators for each key if it's currently pressed or released in the frame
 void InputManager::PressKey(int key)
 {
 	if (!keyMap[key].down)
