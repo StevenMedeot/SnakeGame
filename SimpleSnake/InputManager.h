@@ -28,9 +28,7 @@ public:
 	bool KeyDown(int key);
 	bool KeyUp(int key);
 
-
 	void EndFrame();
-
 
 private:
 	void UpdateInformation(KeyState& state);
