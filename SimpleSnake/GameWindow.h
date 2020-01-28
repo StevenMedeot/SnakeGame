@@ -2,11 +2,14 @@
 #define GAMEWINDOW_H
 
 #include <string>
+
 using namespace std;
 
 class SDL_Window;
 class SDL_Renderer;
 class InputManager;
+
+const float FIXEDTIME = 0.0333f;
 
 class GameWindow
 {
@@ -16,8 +19,13 @@ protected:
 	InputManager* inputManager;
 	bool b_isRunning;
 
+	float elapsedTime;
+	float deltaTime;
+	float fixedTime;
+
 protected:
 	void GetInputs();
+	void CalculateTime();
 public:
 	string title;
 	int screenWidth;

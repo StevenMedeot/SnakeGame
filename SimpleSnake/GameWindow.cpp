@@ -1,11 +1,14 @@
 #include "GameWindow.h"
 #include <SDL.h>
 #include <stdio.h>
+#include <iostream>
 #include "InputManager.h"
 
 void GameWindow::GetInputs()
 {
 	SDL_Event e;
+
+	// Check the events for all inputs then update them in the input manager
 	while (SDL_PollEvent(&e) != 0)
 	{
 		if (e.type == SDL_QUIT)
@@ -24,7 +27,16 @@ void GameWindow::GetInputs()
 
 }
 
-GameWindow::GameWindow(string name, int width, int height): title(name), screenWidth(width), screenHeight(height)
+void GameWindow::CalculateTime()
+{
+	float tick = SDL_GetTicks() * 0.001f;
+	deltaTime = (SDL_GetTicks()* 0.001f) - elapsedTime;
+	fixedTime += deltaTime;
+
+	elapsedTime = tick;
+}
+
+GameWindow::GameWindow(string name, int width, int height) : title(name), screenWidth(width), screenHeight(height), deltaTime(0), elapsedTime(0), fixedTime(0)
 {
 }
 
@@ -65,7 +77,7 @@ bool GameWindow::InitWindow()
 			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 			if (renderer == NULL)
 			{
-				printf("Renderer could not be created! SDL Erorr: $s \n", SDL_GetError());
+				printf("Renderer could not be created! SDL error: $s \n", SDL_GetError());
 				success = false;
 			}
 			else
@@ -89,38 +101,47 @@ bool GameWindow::InitWindow()
 	return success;
 }
 
-int positionX = 0;
-int positionY = 0;
+float positionX = 0;
+float positionY = 0;
 void GameWindow::UpdateWindow()
 {
 	// Game Loop 
 	while (b_isRunning)
 	{
 		GetInputs();
-		if (inputManager->KeyPress(SDLK_ESCAPE))
+		CalculateTime();
+
+		// Fixed update happens once every 1/30th of a second
+		while (fixedTime >= FIXEDTIME)
 		{
-			b_isRunning = false;
-		}
-		if (inputManager->KeyDown(SDLK_d)
-)
-		{
-			positionX += 1;
+			if (inputManager->GetKeyDown(SDLK_ESCAPE))
+			{
+				b_isRunning = false;
+			}
+			if (inputManager->GetKeyDown(SDLK_d))
+			{
+				positionX += 10 * FIXEDTIME;
+			}
+
+			if (inputManager->GetKeyDown(SDLK_a))
+			{
+				positionX -= 10 * FIXEDTIME;
+			}
+
+			if (inputManager->GetKeyDown(SDLK_w))
+			{
+				positionY -= 10 * FIXEDTIME;
+			}
+
+			if (inputManager->GetKeyDown(SDLK_s))
+			{
+				positionY += 10 * FIXEDTIME;
+			}
+			fixedTime -= FIXEDTIME;
 		}
 
-		if (inputManager->KeyDown(SDLK_a))
-		{
-			positionX -= 1;
-		}
+		
 
-		if (inputManager->KeyDown(SDLK_w))
-		{
-			positionY -= 1;
-		}
-
-		if (inputManager->KeyDown(SDLK_s))
-		{
-			positionY += 1;
-		}
 
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
@@ -139,7 +160,6 @@ void GameWindow::UpdateWindow()
 
 void GameWindow::ShutdownWindow()
 {
-
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
