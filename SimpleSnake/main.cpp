@@ -3,7 +3,7 @@
 using namespace std;
 int main(int argc, char* args[])
 {
-	GameWindow *game = new GameWindow("Snake Window", 640, 480);
+	GameWindow *game = new GameWindow("Snake Window", 640, 640);
 	game->InitWindow();
 	game->UpdateWindow();
 	delete game;

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "InputManager.h"
+#include "SnakeObject.h"
 
 void GameWindow::GetInputs()
 {
@@ -91,13 +92,11 @@ bool GameWindow::InitWindow()
 					printf("Input Manager could not be created! \n", SDL_GetError());
 					return false;
 				}
+				GameObject:inputManager = inputManager;
 				b_isRunning = true;
 			}
-
-
 		}
 	}
-
 	return success;
 }
 
@@ -105,6 +104,8 @@ float positionX = 0;
 float positionY = 0;
 void GameWindow::UpdateWindow()
 {
+	GameObject* obj = new SnakeObject(this);
+	GameObject* objs = new SnakeObject(this);
 	// Game Loop 
 	while (b_isRunning)
 	{
@@ -118,25 +119,26 @@ void GameWindow::UpdateWindow()
 			{
 				b_isRunning = false;
 			}
-			if (inputManager->GetKeyDown(SDLK_d))
-			{
-				positionX += 10 * FIXEDTIME;
-			}
+			//if (inputManager->GetKeyDown(SDLK_d))
+			//{
+			//	obj->position.x += 100 * FIXEDTIME;
+			//}
 
-			if (inputManager->GetKeyDown(SDLK_a))
-			{
-				positionX -= 10 * FIXEDTIME;
-			}
+			//if (inputManager->GetKeyDown(SDLK_a))
+			//{
+			//	obj->position.x -= 100 * FIXEDTIME;
+			//}
 
-			if (inputManager->GetKeyDown(SDLK_w))
-			{
-				positionY -= 10 * FIXEDTIME;
-			}
+			//if (inputManager->GetKeyDown(SDLK_w))
+			//{
+			//	obj->position.y -= 100 * FIXEDTIME;
+			//}
 
-			if (inputManager->GetKeyDown(SDLK_s))
-			{
-				positionY += 10 * FIXEDTIME;
-			}
+			//if (inputManager->GetKeyDown(SDLK_s))
+			//{
+			//	obj->position.y += 100 * FIXEDTIME;
+			//}
+			obj->FixedUpdate(FIXEDTIME);
 			fixedTime -= FIXEDTIME;
 		}
 
@@ -146,9 +148,8 @@ void GameWindow::UpdateWindow()
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
 
-		SDL_Rect rect = {positionX, positionY, screenWidth / 4, screenHeight / 4 };
-		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-		SDL_RenderFillRect(renderer, &rect);
+		obj->Render(renderer);
+		objs->Render(renderer);
 
 		//Update the surface
 		SDL_RenderPresent(renderer);
