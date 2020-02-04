@@ -3,13 +3,19 @@
 #include "InputManager.h"
 #include <iostream>
 #include "Helper.h"
+#include <cmath>
 
 
 SnakeObject::SnakeObject(GameWindow* window) : GameObject(window)
 {
 	direction.x = 1;
 	direction.y = 0;
+	targetPosition.x = 1;
+	targetPosition.y = 0;
+	size.x = window->screenWidth / 16;
+	size.y = window->screenHeight / 16;
 	nextSnake = NULL;
+	speed = 10;
 }
 
 SnakeObject::~SnakeObject()
@@ -23,41 +29,101 @@ void SnakeObject::Update(float deltaTime)
 
 void SnakeObject::FixedUpdate(float deltaTime)
 {
-	position.y += direction.y * deltaTime * 100;
-	position.x += direction.x * deltaTime * 100;
 
-	position.y = CLAMP(position.y, 0.0f, (float)gameWindow->screenHeight);
-	position.x = CLAMP(position.x, 0.0f, (float)gameWindow->screenWidth);
+	position.y += (targetPosition.y - position.y) * deltaTime * speed;
+
+	position.x += (targetPosition.x - position.x) * deltaTime * speed;
+
+	position.y = CLAMP(position.y, 0.0f, (float)gameWindow->screenHeight - size.y);
+	position.x = CLAMP(position.x, 0.0f, (float)gameWindow->screenWidth - size.x);
 	
-	if (inputManager->GetKeyDown(SDLK_d))
+	if (controlled)
 	{
-		direction.x = 1;
-		direction.y = 0;
+		if (inputManager->GetKeyDown(SDLK_d))
+		{
+			direction.x = 1;
+			direction.y = 0;
+		}
+		else if (inputManager->GetKeyDown(SDLK_a))
+		{
+			direction.x = -1;
+			direction.y = 0;
+		}
+		else if (inputManager->GetKeyDown(SDLK_w))
+		{
+			direction.x = 0;
+			direction.y = -1;
+		}
+		else if (inputManager->GetKeyDown(SDLK_s))
+		{
+			direction.x = 0;
+			direction.y = 1;
+		}
+
 	}
-	else if (inputManager->GetKeyDown(SDLK_a))
+	if(nextSnake)
+		nextSnake->FixedUpdate(deltaTime);
+	if (CheckPosition())
 	{
-		direction.x = -1;
-		direction.y = 0;
-	}
-	else if (inputManager->GetKeyDown(SDLK_w))
-	{
-		direction.x = 0;
-		direction.y = -1;
-	}
-	else if (inputManager->GetKeyDown(SDLK_s))
-	{
-		direction.x = 0;
-		direction.y = 1;
+		MoveTo(targetPosition.x + direction.x, targetPosition.y + direction.y);
 	}
 }
 
 void SnakeObject::Render(SDL_Renderer * renderer)
 {
-	SDL_Rect rect = { position.x, position.y, 30, 30 };
+	SDL_Rect rect = { position.x * size.x, position.y *size.y, size.x, size.y };
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 	SDL_RenderFillRect(renderer, &rect);
+	if(nextSnake)
+		nextSnake->Render(renderer);
+}
+
+
+void SnakeObject::AddSnake()
+{
+	if (nextSnake == NULL)
+	{
+		nextSnake = new SnakeObject(gameWindow);
+		nextSnake->position = position;
+		nextSnake->position.x -= 1;
+		nextSnake->direction.x = nextSnake->targetPosition.x;
+		nextSnake->direction.y = nextSnake->targetPosition.y;
+	}
+	else
+	{
+		nextSnake->AddSnake();
+	}	
 }
 
 void SnakeObject::MoveTo(int gridX, int gridY)
 {
+	Transform oldTarget = targetPosition;
+	targetPosition.x = CLAMP(gridX, 0, gameWindow->screenWidth / (int)size.x - 1);
+	targetPosition.y = CLAMP(gridY, 0, gameWindow->screenHeight / (int)size.y - 1);
+
+	if (nextSnake)
+	{
+		if (oldTarget.x != targetPosition.x || oldTarget.y != targetPosition.y)
+		{
+			nextSnake->direction.x = oldTarget.x - nextSnake->targetPosition.x;
+			nextSnake->direction.y = oldTarget.y - nextSnake->targetPosition.y;
+		}
+		else
+		{
+			nextSnake->direction.x = 0;
+			nextSnake->direction.y = 0;
+		}
+	}
+}
+
+bool SnakeObject::CheckPosition()
+{
+	if (position.x >= targetPosition.x - 0.1f && position.x <= targetPosition.x + 0.1f)
+	{
+		if (position.y >= targetPosition.y - 0.1f && position.y <= targetPosition.y + 0.1f)
+		{
+			return true;
+		}
+	}
+	return false;
 }

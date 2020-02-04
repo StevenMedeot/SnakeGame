@@ -105,7 +105,7 @@ float positionY = 0;
 void GameWindow::UpdateWindow()
 {
 	GameObject* obj = new SnakeObject(this);
-	GameObject* objs = new SnakeObject(this);
+	((SnakeObject*)obj)->controlled = true;
 	// Game Loop 
 	while (b_isRunning)
 	{
@@ -119,29 +119,14 @@ void GameWindow::UpdateWindow()
 			{
 				b_isRunning = false;
 			}
-			//if (inputManager->GetKeyDown(SDLK_d))
-			//{
-			//	obj->position.x += 100 * FIXEDTIME;
-			//}
 
-			//if (inputManager->GetKeyDown(SDLK_a))
-			//{
-			//	obj->position.x -= 100 * FIXEDTIME;
-			//}
-
-			//if (inputManager->GetKeyDown(SDLK_w))
-			//{
-			//	obj->position.y -= 100 * FIXEDTIME;
-			//}
-
-			//if (inputManager->GetKeyDown(SDLK_s))
-			//{
-			//	obj->position.y += 100 * FIXEDTIME;
-			//}
 			obj->FixedUpdate(FIXEDTIME);
 			fixedTime -= FIXEDTIME;
 		}
 
+
+		if (inputManager->GetKeyPress(SDLK_f))
+			((SnakeObject*)obj)->AddSnake();
 		
 
 
@@ -149,7 +134,6 @@ void GameWindow::UpdateWindow()
 		SDL_RenderClear(renderer);
 
 		obj->Render(renderer);
-		objs->Render(renderer);
 
 		//Update the surface
 		SDL_RenderPresent(renderer);
