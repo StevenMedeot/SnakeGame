@@ -4,6 +4,7 @@
 #include <iostream>
 #include "InputManager.h"
 #include "SnakeObject.h"
+#include <thread>
 
 void GameWindow::GetInputs()
 {
@@ -58,7 +59,7 @@ bool GameWindow::InitWindow()
 	SDL_Surface* screenSurface = NULL;
 
 	//Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_EVERYTHING < 0))
 	{
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 		success = false;
@@ -97,19 +98,24 @@ bool GameWindow::InitWindow()
 			}
 		}
 	}
+
+	std::thread update(&GameWindow::UpdateWindow, this);
+	RenderWindow();
+
+	update.join();
 	return success;
 }
 
+GameObject*  obj;
 float positionX = 0;
 float positionY = 0;
 void GameWindow::UpdateWindow()
 {
-	GameObject* obj = new SnakeObject(this);
+	obj = new SnakeObject(this);
 	((SnakeObject*)obj)->controlled = true;
-	// Game Loop 
+	// Game Loop
 	while (b_isRunning)
 	{
-		GetInputs();
 		CalculateTime();
 
 		// Fixed update happens once every 1/30th of a second
@@ -128,7 +134,20 @@ void GameWindow::UpdateWindow()
 		if (inputManager->GetKeyPress(SDLK_f))
 			((SnakeObject*)obj)->AddSnake();
 		
+		inputManager->EndFrame();
 
+
+
+
+	}
+	delete obj;
+}
+
+void GameWindow::RenderWindow()
+{
+	while (b_isRunning)
+	{
+		GetInputs();
 
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
@@ -137,8 +156,6 @@ void GameWindow::UpdateWindow()
 
 		//Update the surface
 		SDL_RenderPresent(renderer);
-
-		inputManager->EndFrame();
 
 	}
 }

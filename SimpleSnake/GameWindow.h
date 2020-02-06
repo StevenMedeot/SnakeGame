@@ -48,6 +48,7 @@ public:
 
 	bool InitWindow();
 	void UpdateWindow();
+	void RenderWindow();
 	void ShutdownWindow();
 
 

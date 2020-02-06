@@ -20,6 +20,8 @@ SnakeObject::SnakeObject(GameWindow* window) : GameObject(window)
 
 SnakeObject::~SnakeObject()
 {
+	if (nextSnake)
+		delete nextSnake;
 }
 
 void SnakeObject::Update(float deltaTime)
@@ -72,8 +74,16 @@ void SnakeObject::FixedUpdate(float deltaTime)
 void SnakeObject::Render(SDL_Renderer * renderer)
 {
 	SDL_Rect rect = { position.x * size.x, position.y *size.y, size.x, size.y };
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+	SDL_SetRenderDrawColor(renderer, 0xAA, 0x00, 0xFF, 0xFF);
 	SDL_RenderFillRect(renderer, &rect);
+
+	if (controlled)
+	{
+		SDL_Rect rectTwo = { (position.x * size.x + size.x/2 - size.x/8) + direction.x * size.x/2, (position.y* size.y + size.y / 2 - size.y/8) + direction.y * size.y/2, size.x/4, size.y/4 };
+		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+		SDL_RenderFillRect(renderer, &rectTwo);
+
+	}
 	if(nextSnake)
 		nextSnake->Render(renderer);
 }
@@ -85,9 +95,11 @@ void SnakeObject::AddSnake()
 	{
 		nextSnake = new SnakeObject(gameWindow);
 		nextSnake->position = position;
-		nextSnake->position.x -= 1;
-		nextSnake->direction.x = nextSnake->targetPosition.x;
-		nextSnake->direction.y = nextSnake->targetPosition.y;
+		nextSnake->position.x = position.x - direction.x;
+		nextSnake->position.y = position.y - direction.y;
+
+		nextSnake->targetPosition.x = targetPosition.x;
+		nextSnake->targetPosition.y = targetPosition.y;
 	}
 	else
 	{
