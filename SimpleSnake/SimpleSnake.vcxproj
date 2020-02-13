@@ -122,6 +122,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EatableObject.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWindow.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="SnakeObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EatableObject.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameWindow.h" />
     <ClInclude Include="Helper.h" />

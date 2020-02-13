@@ -15,6 +15,7 @@ protected:
 	InputManager* inputManager;
 public:
 	Transform position;
+	Transform size;
 public:
 	GameObject(GameWindow* window);
 	~GameObject();

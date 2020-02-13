@@ -4,6 +4,7 @@
 #include <iostream>
 #include "InputManager.h"
 #include "SnakeObject.h"
+#include "EatableObject.h"
 #include <thread>
 
 void GameWindow::GetInputs()
@@ -106,9 +107,12 @@ bool GameWindow::InitWindow()
 	return success;
 }
 
-GameObject*  obj;
-float positionX = 0;
-float positionY = 0;
+GameObject* obj;
+GameObject* eat;
+
+float frameTime = 0.0f;
+int framesPerSecond = 0;
+
 void GameWindow::UpdateWindow()
 {
 	obj = new SnakeObject(this);
@@ -118,6 +122,7 @@ void GameWindow::UpdateWindow()
 	{
 		CalculateTime();
 
+		frameTime += deltaTime;
 		// Fixed update happens once every 1/30th of a second
 		while (fixedTime >= FIXEDTIME)
 		{
@@ -130,18 +135,23 @@ void GameWindow::UpdateWindow()
 			fixedTime -= FIXEDTIME;
 		}
 
-
-		if (inputManager->GetKeyPress(SDLK_f))
-			((SnakeObject*)obj)->AddSnake();
+		obj->Update(deltaTime);
 		
 		inputManager->EndFrame();
 
-
+		if (frameTime >= 1)
+		{
+			std::cout << framesPerSecond << std::endl;
+			framesPerSecond = 0;
+			frameTime -= 1;
+		}
+			
 
 
 	}
 	delete obj;
 }
+
 
 void GameWindow::RenderWindow()
 {
@@ -156,6 +166,8 @@ void GameWindow::RenderWindow()
 
 		//Update the surface
 		SDL_RenderPresent(renderer);
+		framesPerSecond++;
+
 
 	}
 }

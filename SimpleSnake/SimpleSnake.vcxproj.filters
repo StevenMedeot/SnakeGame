@@ -30,6 +30,9 @@
     <ClCompile Include="SnakeObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EatableObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameWindow.h">
@@ -46,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="Helper.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EatableObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

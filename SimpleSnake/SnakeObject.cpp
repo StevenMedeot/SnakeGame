@@ -4,7 +4,8 @@
 #include <iostream>
 #include "Helper.h"
 #include <cmath>
-
+#include <time.h>
+#include "EatableObject.h"
 
 SnakeObject::SnakeObject(GameWindow* window) : GameObject(window)
 {
@@ -26,7 +27,13 @@ SnakeObject::~SnakeObject()
 
 void SnakeObject::Update(float deltaTime)
 {
-
+	if (controlled)
+	{
+		if (inputManager->GetKeyPress(SDLK_o))
+		{
+			SpawnEatable();
+		}
+	}
 }
 
 void SnakeObject::FixedUpdate(float deltaTime)
@@ -65,14 +72,26 @@ void SnakeObject::FixedUpdate(float deltaTime)
 	}
 	if(nextSnake)
 		nextSnake->FixedUpdate(deltaTime);
-	if (CheckPosition())
+	if (CheckPosition(targetPosition, 0.1f))
 	{
+		if (controlled && eat)
+		{
+			if (CheckPosition(eat->position, 0.2f))
+			{
+				AddSnake();
+				SpawnEatable();
+			}
+		}
 		MoveTo(targetPosition.x + direction.x, targetPosition.y + direction.y);
 	}
 }
 
 void SnakeObject::Render(SDL_Renderer * renderer)
 {
+	if (eat)
+		eat->Render(renderer);
+
+
 	SDL_Rect rect = { position.x * size.x, position.y *size.y, size.x, size.y };
 	SDL_SetRenderDrawColor(renderer, 0xAA, 0x00, 0xFF, 0xFF);
 	SDL_RenderFillRect(renderer, &rect);
@@ -86,6 +105,8 @@ void SnakeObject::Render(SDL_Renderer * renderer)
 	}
 	if(nextSnake)
 		nextSnake->Render(renderer);
+
+
 }
 
 
@@ -94,12 +115,12 @@ void SnakeObject::AddSnake()
 	if (nextSnake == NULL)
 	{
 		nextSnake = new SnakeObject(gameWindow);
-		nextSnake->position = position;
 		nextSnake->position.x = position.x - direction.x;
 		nextSnake->position.y = position.y - direction.y;
 
-		nextSnake->targetPosition.x = targetPosition.x;
-		nextSnake->targetPosition.y = targetPosition.y;
+		nextSnake->targetPosition.x = targetPosition.x - direction.x;
+		nextSnake->targetPosition.y = targetPosition.y - direction.y;
+		nextSnake->direction = direction;
 	}
 	else
 	{
@@ -128,11 +149,21 @@ void SnakeObject::MoveTo(int gridX, int gridY)
 	}
 }
 
-bool SnakeObject::CheckPosition()
+void SnakeObject::SpawnEatable()
 {
-	if (position.x >= targetPosition.x - 0.1f && position.x <= targetPosition.x + 0.1f)
+	if (!eat)
+		eat = new EatableObject(gameWindow);
+	
+	srand(time(NULL));
+	eat->position.x = rand() % 16;
+	eat->position.y = rand() % 16;
+}
+
+bool SnakeObject::CheckPosition(Transform target, float distance)
+{
+	if (position.x >= target.x - distance && position.x <= target.x + distance)
 	{
-		if (position.y >= targetPosition.y - 0.1f && position.y <= targetPosition.y + 0.1f)
+		if (position.y >= target.y - distance && position.y <= target.y + distance)
 		{
 			return true;
 		}

@@ -6,9 +6,9 @@ class SnakeObject :	public GameObject
 {
 private:
 	Transform targetPosition;
+	class EatableObject* eat;
 protected:
 	Transform direction;
-	Transform size;
 	SnakeObject* nextSnake;
 
 	float speed;
@@ -24,8 +24,10 @@ public:
 	void MoveTo(int gridX, int gridY);
 	bool controlled = false;
 
+	void SpawnEatable();
+
 private:
-	bool CheckPosition();
+	bool CheckPosition(Transform target, float distance);
 };
 
 #endif
