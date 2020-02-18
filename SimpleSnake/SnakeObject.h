@@ -10,6 +10,7 @@ private:
 protected:
 	Transform direction;
 	SnakeObject* nextSnake;
+	Transform targetDir;
 
 	float speed;
 public:

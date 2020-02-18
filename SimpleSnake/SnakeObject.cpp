@@ -16,7 +16,7 @@ SnakeObject::SnakeObject(GameWindow* window) : GameObject(window)
 	size.x = window->screenWidth / 16;
 	size.y = window->screenHeight / 16;
 	nextSnake = NULL;
-	speed = 10;
+	speed = 6;
 }
 
 SnakeObject::~SnakeObject()
@@ -38,10 +38,17 @@ void SnakeObject::Update(float deltaTime)
 
 void SnakeObject::FixedUpdate(float deltaTime)
 {
-
-	position.y += (targetPosition.y - position.y) * deltaTime * speed;
-
-	position.x += (targetPosition.x - position.x) * deltaTime * speed;
+	if (targetPosition.x != position.x)
+	{
+		float targeDirX = (targetPosition.x - position.x) / abs(targetPosition.x - position.x);
+		position.x += targeDirX * deltaTime * speed;
+	}
+	if (targetPosition.y != position.y)
+	{
+		float targeDirY = (targetPosition.y - position.y) / abs(targetPosition.y - position.y);
+		position.y += targeDirY * deltaTime * speed;
+	}
+	
 
 	position.y = CLAMP(position.y, 0.0f, (float)gameWindow->screenHeight - size.y);
 	position.x = CLAMP(position.x, 0.0f, (float)gameWindow->screenWidth - size.x);
@@ -98,7 +105,15 @@ void SnakeObject::Render(SDL_Renderer * renderer)
 
 	if (controlled)
 	{
-		SDL_Rect rectTwo = { (position.x * size.x + size.x/2 - size.x/8) + direction.x * size.x/2, (position.y* size.y + size.y / 2 - size.y/8) + direction.y * size.y/2, size.x/4, size.y/4 };
+		float targeDirX = direction.x;
+		float targeDirY = direction.y;
+		if (targetPosition.x != position.x)
+			targeDirX = (targetPosition.x - position.x) / abs(targetPosition.x - position.x);
+		if (targetPosition.y != position.y)
+			targeDirY = (targetPosition.y - position.y) / abs(targetPosition.y - position.y);
+
+
+		SDL_Rect rectTwo = { (position.x * size.x + size.x/2 - size.x/8) + targeDirX * size.x/2, (position.y* size.y + size.y / 2 - size.y/8) + targeDirY * size.y/2, size.x/4, size.y/4 };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &rectTwo);
 
@@ -130,6 +145,7 @@ void SnakeObject::AddSnake()
 
 void SnakeObject::MoveTo(int gridX, int gridY)
 {
+	position = targetPosition;
 	Transform oldTarget = targetPosition;
 	targetPosition.x = CLAMP(gridX, 0, gameWindow->screenWidth / (int)size.x - 1);
 	targetPosition.y = CLAMP(gridY, 0, gameWindow->screenHeight / (int)size.y - 1);
