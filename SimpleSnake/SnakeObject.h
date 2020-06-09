@@ -29,6 +29,7 @@ public:
 
 private:
 	bool CheckPosition(Transform target, float distance);
+	bool CheckOverlap(Transform target, float distance);
 };
 
 #endif

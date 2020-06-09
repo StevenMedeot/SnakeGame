@@ -33,6 +33,10 @@ void SnakeObject::Update(float deltaTime)
 		{
 			SpawnEatable();
 		}
+		if (inputManager->GetKeyPress(SDLK_f))
+		{
+			AddSnake();
+		}
 	}
 }
 
@@ -77,13 +81,13 @@ void SnakeObject::FixedUpdate(float deltaTime)
 		}
 
 	}
-	if(nextSnake)
+	if (nextSnake)
 		nextSnake->FixedUpdate(deltaTime);
-	if (CheckPosition(targetPosition, 0.1f))
+	if (CheckPosition(targetPosition, 0.01f))
 	{
 		if (controlled && eat)
 		{
-			if (CheckPosition(eat->position, 0.2f))
+			if (CheckPosition(eat->position, 0.4f))
 			{
 				AddSnake();
 				SpawnEatable();
@@ -113,12 +117,12 @@ void SnakeObject::Render(SDL_Renderer * renderer)
 			targeDirY = (targetPosition.y - position.y) / abs(targetPosition.y - position.y);
 
 
-		SDL_Rect rectTwo = { (position.x * size.x + size.x/2 - size.x/8) + targeDirX * size.x/2, (position.y* size.y + size.y / 2 - size.y/8) + targeDirY * size.y/2, size.x/4, size.y/4 };
+		SDL_Rect rectTwo = { (position.x * size.x + size.x / 2 - size.x / 8) + targeDirX * size.x / 2, (position.y* size.y + size.y / 2 - size.y / 8) + targeDirY * size.y / 2, size.x / 4, size.y / 4 };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &rectTwo);
 
 	}
-	if(nextSnake)
+	if (nextSnake)
 		nextSnake->Render(renderer);
 
 
@@ -140,7 +144,7 @@ void SnakeObject::AddSnake()
 	else
 	{
 		nextSnake->AddSnake();
-	}	
+	}
 }
 
 void SnakeObject::MoveTo(int gridX, int gridY)
@@ -169,10 +173,17 @@ void SnakeObject::SpawnEatable()
 {
 	if (!eat)
 		eat = new EatableObject(gameWindow);
-	
+
 	srand(time(NULL));
 	eat->position.x = rand() % 16;
 	eat->position.y = rand() % 16;
+
+	while (CheckOverlap(eat->position, 1.0f))
+	{
+		eat->position.x = rand() % 16;
+		eat->position.y = rand() % 16;
+	}
+	
 }
 
 bool SnakeObject::CheckPosition(Transform target, float distance)
@@ -184,5 +195,24 @@ bool SnakeObject::CheckPosition(Transform target, float distance)
 			return true;
 		}
 	}
+	return false;
+}
+
+bool SnakeObject::CheckOverlap(Transform target, float distance)
+{
+	
+	if (position.x >= target.x - distance && position.x <= target.x + distance)
+	{
+		if (position.y >= target.y - distance && position.y <= target.y + distance)
+		{
+			cout << "True : " << position.x << " _ " << position.y << " : " << target.x << " _ " << target.y << endl;
+			return true;
+		}
+	}
+	else if (nextSnake)
+	{
+		return nextSnake->CheckOverlap(target, distance);
+	}
+
 	return false;
 }
